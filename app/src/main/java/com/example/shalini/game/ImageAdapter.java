@@ -18,9 +18,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
 
     List<MediaItem> mediaItemList;
     boolean showImages = true;
+    private String mRandomUrl;
+    ImageLoadListener mImageLoadListener;
 
-    public ImageAdapter(List<MediaItem> mediaItemList) {
+    public ImageAdapter(List<MediaItem> mediaItemList, ImageLoadListener imageLoadListener) {
         this.mediaItemList = mediaItemList;
+        mImageLoadListener = imageLoadListener;
     }
 
     @Override
@@ -56,9 +59,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         mediaItemList = mediaList;
     }
 
-    public void flipAllViews() {
+    public void flipAllViews(String url) {
         showImages = false;
         notifyDataSetChanged();
+        mRandomUrl = url;
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder{
@@ -77,7 +81,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
                 public void onClick(View click) {
 
                     flipViewFlipper(viewFlipper);
-
+                    if (mRandomUrl.equals(mediaItemList.get(getAdapterPosition()))){
+                        mImageLoadListener.isImageSelectedCorrect(true);
+                    }else{
+                        mImageLoadListener.isImageSelectedCorrect(false);
+                    }
                 }
 
             });

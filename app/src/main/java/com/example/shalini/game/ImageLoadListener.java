@@ -5,5 +5,5 @@ package com.example.shalini.game;
  */
 
 interface ImageLoadListener {
-    void setImageLoadingCompleted(boolean loadingCompleted);
+    void isImageSelectedCorrect(boolean loadingCompleted);
 }

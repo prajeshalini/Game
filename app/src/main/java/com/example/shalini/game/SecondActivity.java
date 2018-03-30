@@ -1,6 +1,5 @@
 package com.example.shalini.game;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.shalini.game.data.ImageService;
 import com.example.shalini.game.data.RemoteDataSource;
 
@@ -21,7 +22,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class SecondActivity extends AppCompatActivity{
+public class SecondActivity extends AppCompatActivity implements ImageLoadListener{
     private static final String TAG = "SecondActivity";
     private TextView mTextField;
     private RecyclerView mRecyclerView;
@@ -53,7 +54,7 @@ public class SecondActivity extends AppCompatActivity{
                 mediaItems[i] = imageListModel.getImageModelList().get(i);
             }
             mediaItemList = Arrays.asList(mediaItems);
-            imageAdapter = new ImageAdapter(Arrays.asList(mediaItems));
+            imageAdapter = new ImageAdapter(Arrays.asList(mediaItems),this);
             mRecyclerView.setAdapter(imageAdapter);
             startCountdown();
         });
@@ -71,16 +72,23 @@ public class SecondActivity extends AppCompatActivity{
 
             public void onFinish() {
                 mTextField.setText("done!");
-                imageAdapter.flipAllViews();
-                mImageView.setImageURI(Uri.parse(mediaItemList.get(new Random().nextInt(mediaItemList.size())).getImageModel().getImageUrl()));
+                String randomImageUrl = mediaItemList.get(new Random().nextInt(mediaItemList.size())).getImageModel().getImageUrl();
+                imageAdapter.flipAllViews(randomImageUrl);
+                Glide.with(SecondActivity.this)
+                        .load(mediaItemList.get(new Random().nextInt(mediaItemList.size())).getImageModel().getImageUrl())
+                        .centerCrop()
+                        .into(mImageView);
             }
 
         }.start();
     }
-ImageLoadListener imageLoadListener = new ImageLoadListener() {
+
     @Override
-    public void setImageLoadingCompleted(boolean loadingCompleted) {
-        startCountdown();
+    public void isImageSelectedCorrect(boolean isImageCorrect) {
+        if (isImageCorrect){
+            Toast.makeText(this,"YOU WON",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,"YOU LOSE",Toast.LENGTH_SHORT).show();
+        }
     }
-};
 }
