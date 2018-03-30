@@ -2,7 +2,9 @@ package com.example.shalini.game;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ViewFlipper;
 
 import com.example.shalini.game.databinding.LayoutRowItemBinding;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
 
     List<MediaItem> mediaItemList;
+    boolean showImages = true;
 
     public ImageAdapter(List<MediaItem> mediaItemList) {
         this.mediaItemList = mediaItemList;
@@ -31,6 +34,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, int position) {
         MediaItem mediaItem = mediaItemList.get(position);
         holder.bind(mediaItem.getImageModel());
+
+        if (showImages){
+            holder.viewFlipper.setDisplayedChild(0);
+        }else{
+            holder.viewFlipper.setDisplayedChild(1);
+        }
     }
 
     @Override
@@ -47,12 +56,40 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         mediaItemList = mediaList;
     }
 
+    public void flipAllViews() {
+        showImages = false;
+        notifyDataSetChanged();
+    }
+
     class MyViewHolder extends RecyclerView.ViewHolder{
+        private final ViewFlipper viewFlipper;
         LayoutRowItemBinding layoutRowItemBinding;
 
         public MyViewHolder(LayoutRowItemBinding itemView) {
             super(itemView.getRoot());
             layoutRowItemBinding = itemView;
+            viewFlipper = itemView.getRoot().findViewById(R.id.my_view_flipper);
+
+           // flipViewFlipper(viewFlipper);
+            //now you set your onclick and pass it the current viewflipper to control the displayed child
+            viewFlipper.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View click) {
+
+                    flipViewFlipper(viewFlipper);
+
+                }
+
+            });
+
+        }
+
+        private void flipViewFlipper(ViewFlipper viewFlipper) {
+            if(viewFlipper.getDisplayedChild() == 0){
+                viewFlipper.setDisplayedChild(1);
+            } else{
+                viewFlipper.setDisplayedChild(0);
+            }
         }
 
         public void bind(ImageModel imageModel){
