@@ -2,6 +2,7 @@ package com.example.shalini.game;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +61,8 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
 
     private void resetImages() {
         tryCounter = 0;
+        mbuttonReset.setVisibility(View.GONE);
+        mImageView.setImageDrawable(ContextCompat.getDrawable(this,R.mipmap.ic_launcher));
         mRemoteDataSource = RemoteDataSource.getInstance();
         Observable<ImageListModel> observable = mRemoteDataSource.createApiService(ImageService.class).getImageUrlList()
                 .subscribeOn(Schedulers.io())
@@ -105,6 +108,7 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
         if (tryCounter <= 2){
             if (isImageCorrect){
                 Toast.makeText(this,"YOU WON",Toast.LENGTH_SHORT).show();
+                mbuttonReset.setVisibility(View.VISIBLE);
             } else {
                 Toast.makeText(this,"Try Again",Toast.LENGTH_SHORT).show();
             }
