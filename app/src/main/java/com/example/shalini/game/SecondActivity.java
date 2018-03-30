@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,10 +29,12 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
     private TextView mTextField;
     private RecyclerView mRecyclerView;
     private ImageView mImageView;
+    private Button mbuttonReset;
 
     private List<MediaItem> mediaItemList;
     private RemoteDataSource mRemoteDataSource;
     private ImageAdapter imageAdapter;
+    private int tryCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +42,24 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
         setContentView(R.layout.activity_second);
         mTextField = findViewById(R.id.textViewTimer);
         mImageView = findViewById(R.id.imageViewRandom);
+        mbuttonReset = findViewById(R.id.buttonReset);
 
         mRecyclerView = findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,3);
         mRecyclerView.setLayoutManager(layoutManager);
 
+       resetImages();
+        mbuttonReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetImages();
+            }
+        });
+
+    }
+
+    private void resetImages() {
+        tryCounter = 0;
         mRemoteDataSource = RemoteDataSource.getInstance();
         Observable<ImageListModel> observable = mRemoteDataSource.createApiService(ImageService.class).getImageUrlList()
                 .subscribeOn(Schedulers.io())
@@ -58,8 +75,6 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
             mRecyclerView.setAdapter(imageAdapter);
             startCountdown();
         });
-
-
     }
 
     private void startCountdown() {
@@ -72,10 +87,11 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
 
             public void onFinish() {
                 mTextField.setText("done!");
+                mImageView.setVisibility(View.VISIBLE);
                 String randomImageUrl = mediaItemList.get(new Random().nextInt(mediaItemList.size())).getImageModel().getImageUrl();
                 imageAdapter.flipAllViews(randomImageUrl);
                 Glide.with(SecondActivity.this)
-                        .load(mediaItemList.get(new Random().nextInt(mediaItemList.size())).getImageModel().getImageUrl())
+                        .load(randomImageUrl)
                         .centerCrop()
                         .into(mImageView);
             }
@@ -85,10 +101,17 @@ public class SecondActivity extends AppCompatActivity implements ImageLoadListen
 
     @Override
     public void isImageSelectedCorrect(boolean isImageCorrect) {
-        if (isImageCorrect){
-            Toast.makeText(this,"YOU WON",Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this,"YOU LOSE",Toast.LENGTH_SHORT).show();
+        tryCounter++;
+        if (tryCounter <= 2){
+            if (isImageCorrect){
+                Toast.makeText(this,"YOU WON",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this,"Try Again",Toast.LENGTH_SHORT).show();
+            }
         }
+        if (tryCounter == 2){
+            mbuttonReset.setVisibility(View.VISIBLE);
+        }
+
     }
 }

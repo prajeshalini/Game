@@ -81,7 +81,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
                 public void onClick(View click) {
 
                     flipViewFlipper(viewFlipper);
-                    if (mRandomUrl.equals(mediaItemList.get(getAdapterPosition()))){
+                    if (mRandomUrl.equals(mediaItemList.get(getAdapterPosition()).getImageModel().getImageUrl())){
                         mImageLoadListener.isImageSelectedCorrect(true);
                     }else{
                         mImageLoadListener.isImageSelectedCorrect(false);
